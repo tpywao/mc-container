@@ -17,7 +17,7 @@ env:
   ECS_CONTAINER: server
   # deploy
   ECS_CLUSTER: mc-chiwanano
-  ECS_SERVICE: mcbe_server_service
+  ECS_SERVICE: mcbe_service
 
 jobs:
   build-and-deploy:
@@ -65,14 +65,13 @@ jobs:
           container-name: ${{ env.ECS_CONTAINER }}
           image: ${{ steps.build-image.outputs.image }}
 
-      # MEMO: 以下は、一旦ECSタスク定義の更新までを確認するためコメントアウト
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{ env.ECS_SERVICE }}
-      #     cluster: ${{ env.ECS_CLUSTER }}
-      #     wait-for-service-stability: true
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
 
       # - name: get world data
       # branch tpywao/mc-chiwanano

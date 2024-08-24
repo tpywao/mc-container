@@ -14,7 +14,7 @@ env:
   ECR_REPOSITORY: mcbe/server
   # render task difinition
   ECS_TASK_DIFINITION: .aws/task-definition.json
-  ECS_CONTAINER: mcbe
+  ECS_CONTAINER: server
   # deploy
   ECS_CLUSTER: mc-chiwanano
   ECS_SERVICE: mcbe_server_service

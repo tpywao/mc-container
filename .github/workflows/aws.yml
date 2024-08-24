@@ -7,12 +7,17 @@ on:
       - main
 
 env:
+  # login to aws
   AWS_REGION: ap-northeast-1
   AWS_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActions
-  ECR_REPOSITORY: mc/server
-  ECS_SERVICE: mc-container
+  # push image to ecr
+  ECR_REPOSITORY: mcbe/server
+  # render task difinition
+  ECS_TASK_DIFINITION: task-definition.json
+  ECS_CONTAINER: mcbe
+  # deploy
+  ECS_SERVICE: mc-server
   ECS_CLUSTER: mc-chiwanano
-  ECS_CONTAINER: mc-chiwanano
 
 jobs:
   build-and-deploy:
@@ -48,18 +53,19 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
+          IMAGE_NAME: "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --build-args SERVER_URL=${{ env.SERVER_URL }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          docker build -t $IMAGE_NAME . --build-arg MCBE_SERVER_ZIP_PATH=${{ env.MCBE_SERVER_ZIP_PATH }}
+          docker push $IMAGE_NAME
+          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
       # MEMO: 以下は、一旦ECRへのプッシュまでを確認するためコメントアウト
       # - name: Fill in the new image ID in the Amazon ECS task definition
       #   id: task-def
       #   uses: aws-actions/amazon-ecs-render-task-definition@v1
       #   with:
-      #     task-definition: task-definition.json
-      #     container-name: my-container
+      #     task-definition: ${{ env.ECS_TASK_DIFINITION }}
+      #     container-name: ${{ env.ECS_CONTAINER }}
       #     image: ${{ steps.build-image.outputs.image }}
 
       # - name: Deploy Amazon ECS task definition

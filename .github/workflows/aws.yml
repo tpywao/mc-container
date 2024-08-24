@@ -13,11 +13,11 @@ env:
   # push image to ecr
   ECR_REPOSITORY: mcbe/server
   # render task difinition
-  ECS_TASK_DIFINITION: task-definition.json
+  ECS_TASK_DIFINITION: .aws/task-definition.json
   ECS_CONTAINER: mcbe
   # deploy
-  ECS_SERVICE: mc-server
   ECS_CLUSTER: mc-chiwanano
+  ECS_SERVICE: mcbe_server_service
 
 jobs:
   build-and-deploy:
@@ -57,15 +57,15 @@ jobs:
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           echo "image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
-      # MEMO: 以下は、一旦ECRへのプッシュまでを確認するためコメントアウト
-      # - name: Fill in the new image ID in the Amazon ECS task definition
-      #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: ${{ env.ECS_TASK_DIFINITION }}
-      #     container-name: ${{ env.ECS_CONTAINER }}
-      #     image: ${{ steps.build-image.outputs.image }}
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DIFINITION }}
+          container-name: ${{ env.ECS_CONTAINER }}
+          image: ${{ steps.build-image.outputs.image }}
 
+      # MEMO: 以下は、一旦ECSタスク定義の更新までを確認するためコメントアウト
       # - name: Deploy Amazon ECS task definition
       #   uses: aws-actions/amazon-ecs-deploy-task-definition@v2
       #   with:

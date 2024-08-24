@@ -51,13 +51,11 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
-          IMAGE_NAME: "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
         run: |
-          docker build -t $IMAGE_NAME . --build-arg MCBE_SERVER_ZIP_PATH=${{ env.MCBE_SERVER_ZIP_PATH }}
-          docker push $IMAGE_NAME
-          echo "image=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} . --build-arg MCBE_SERVER_ZIP_PATH=${{ env.MCBE_SERVER_ZIP_PATH }}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          echo "image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
 
       # MEMO: 以下は、一旦ECRへのプッシュまでを確認するためコメントアウト
       # - name: Fill in the new image ID in the Amazon ECS task definition

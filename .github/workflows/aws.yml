@@ -42,26 +42,29 @@ jobs:
 
   build:
     name: Docker Image Build
+    needs: login-ecr
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} . --build-arg MCBE_SERVER_ZIP_PATH=${{ vars.MCBE_SERVER_ZIP_PATH }}
 
   push:
     name: Docker Image push to ECR
-    needs: build
+    needs:
+      - login-ecr
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           export image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
@@ -70,7 +73,9 @@ jobs:
 
   # deploy:
   #   name: Deploy to ECS
-  #   needs: push
+  #   needs:
+  #     - push
+  #     - login-ecr
   #   runs-on: ubuntu-latest
   #   steps:
   #     - name: Checkout

@@ -23,12 +23,11 @@ permissions:
   contents: read
 
 jobs:
-  login-ecr:
-    name: Login to ECR
+  build-and-push:
+    name: Build and Push image
     runs-on: ubuntu-latest
     outputs:
-      registry: ${{ steps.output.outputs.registry }}
-      registry-origin: ${{ steps.login.outputs.registry }}
+      image: ${{ steps.push.outputs.image }}
     permissions:
       id-token: write
     steps:
@@ -48,70 +47,53 @@ jobs:
         with:
           mask-password: "false"
 
-      - name: Output
-        id: output
-        run: |
-          echo "registry=${{ steps.login.outputs.registry }}" >> $GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  build:
-    name: Docker Image Build
-    needs: login-ecr
+      - name: Build
+        id: build
+        env:
+          ECR_REGISTRY: ${{ steps.login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          MCBE_SERVER_ZIP_PATH: ${{ vars.MCBE_SERVER_ZIP_PATH }}
+        run: |
+          export IMAGE=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+          docker build -t ${IMAGE} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+
+      - name: Push image to Amazon ECR
+        id: push
+        env:
+          IMAGE: ${{ steps.build.outputs.image }}
+          ECR_REGISTRY: ${{ steps.login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push ${IMAGE}
+
+  deploy:
+    name: Deploy to ECS
+    needs:
+      - build-and-push
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build
-        env:
-          ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
-          ECR_REGISTRY_ORIGIN: ${{ needs.login-ecr.outputs.registry-origin }}
-          IMAGE_TAG: ${{ github.sha }}
-          MCBE_SERVER_ZIP_PATH: ${{ vars.MCBE_SERVER_ZIP_PATH }}
-        run: |
-          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
 
-  push:
-    name: Docker Image push to ECR
-    needs:
-      - login-ecr
-      - build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          export image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
-          # docker push ${image}
-          echo "image=${image}" >> $GITHUB_OUTPUT
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DIFINITION }}
+          container-name: ${{ env.ECS_CONTAINER }}
+          image: ${{ needs.build-and-push.outputs.image }}
 
-  # deploy:
-  #   name: Deploy to ECS
-  #   needs:
-  #     - push
-  #     - login-ecr
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-
-  #     - name: Fill in the new image ID in the Amazon ECS task definition
-  #       id: task-def
-  #       uses: aws-actions/amazon-ecs-render-task-definition@v1
-  #       with:
-  #         task-definition: ${{ env.ECS_TASK_DIFINITION }}
-  #         container-name: ${{ env.ECS_CONTAINER }}
-  #         # image: ${{ steps.build-image.outputs.image }}
-  #         image: ${{ needs.build.outputs.image }}
-
-  #     - name: Deploy Amazon ECS task definition
-  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-  #       with:
-  #         task-definition: ${{ steps.task-def.outputs.task-definition }}
-  #         service: ${{ env.ECS_SERVICE }}
-  #         cluster: ${{ env.ECS_CLUSTER }}
-  #         wait-for-service-stability: true
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
 
   # build-and-deploy:
   #   name: Build and Deploy

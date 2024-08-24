@@ -62,22 +62,19 @@ jobs:
           echo "image=${IMAGE}" >> $GITHUB_OUTPUT
 
       - name: Push image to Amazon ECR
-        env:
-          IMAGE: ${{ steps.build.outputs.image }}
-          ECR_REGISTRY: ${{ steps.login.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker push ${IMAGE}
+          docker push ${{ steps.build.outputs.image }}
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
-        env:
-          IMAGE: ${{ steps.build.outputs.image }}
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DIFINITION }}
           container-name: ${{ env.ECS_CONTAINER }}
-          image: $IMAGE
+          image: ${{ steps.build.outputs.image }}
+
+      - name:
+        run: echo ${{ steps.task-def.outputs.task-definition }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2

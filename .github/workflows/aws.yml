@@ -27,7 +27,7 @@ jobs:
     name: Build and Push image
     runs-on: ubuntu-latest
     outputs:
-      image: ${{ steps.push.outputs.image }}
+      image: ${{ steps.build.outputs.image }}
     permissions:
       id-token: write
     steps:

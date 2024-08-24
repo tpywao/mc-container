@@ -60,7 +60,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           MCBE_SERVER_ZIP_PATH: ${{ vars.MCBE_SERVER_ZIP_PATH }}
         run: |
-          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
+          docker build -t ${{ needs.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
 
   push:
     name: Docker Image push to ECR

@@ -27,7 +27,8 @@ jobs:
     name: Login to ECR
     runs-on: ubuntu-latest
     outputs:
-      registry: ${{ steps.login.outputs.registry }}
+      registry: ${{ steps.output.outputs.registry }}
+      registry-origin: ${{ steps.login.outputs.registry }}
     permissions:
       id-token: write
     steps:
@@ -47,6 +48,11 @@ jobs:
         with:
           mask-password: "false"
 
+      - name: Output
+        id: output
+        run: |
+          echo "registry=${{ steps.login.outputs.registry }}" >> $GITHUB_OUTPUT
+
   build:
     name: Docker Image Build
     needs: login-ecr
@@ -57,10 +63,11 @@ jobs:
       - name: Build
         env:
           ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
+          ECR_REGISTRY_ORIGIN: ${{ needs.login-ecr.outputs.registry-origin }}
           IMAGE_TAG: ${{ github.sha }}
           MCBE_SERVER_ZIP_PATH: ${{ vars.MCBE_SERVER_ZIP_PATH }}
         run: |
-          docker build -t ${{ needs.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
+          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
 
   push:
     name: Docker Image push to ECR

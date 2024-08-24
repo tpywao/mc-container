@@ -58,8 +58,9 @@ jobs:
         env:
           ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
+          MCBE_SERVER_ZIP_PATH: ${{ vars.MCBE_SERVER_ZIP_PATH }}
         run: |
-          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} . --build-arg MCBE_SERVER_ZIP_PATH=${{ vars.MCBE_SERVER_ZIP_PATH }}
+          docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
 
   push:
     name: Docker Image push to ECR
@@ -74,7 +75,7 @@ jobs:
           ECR_REGISTRY: ${{ needs.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          export image=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          export image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
           # docker push ${image}
           echo "image=${image}" >> $GITHUB_OUTPUT
 

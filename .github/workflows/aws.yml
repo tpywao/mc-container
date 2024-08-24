@@ -23,8 +23,8 @@ permissions:
   contents: read
 
 jobs:
-  build-and-push:
-    name: Build and Push image
+  build-and-deploy:
+    name: Build and Deploy to ECS Fargate
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.build.outputs.image }}
@@ -62,7 +62,6 @@ jobs:
           echo "image=${IMAGE}" >> $GITHUB_OUTPUT
 
       - name: Push image to Amazon ECR
-        id: push
         env:
           IMAGE: ${{ steps.build.outputs.image }}
           ECR_REGISTRY: ${{ steps.login.outputs.registry }}
@@ -70,22 +69,15 @@ jobs:
         run: |
           docker push ${IMAGE}
 
-  deploy:
-    name: Deploy to ECS
-    needs:
-      - build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
+        env:
+          IMAGE: ${{ steps.build.outputs.image }}
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DIFINITION }}
           container-name: ${{ env.ECS_CONTAINER }}
-          image: ${{ needs.build-and-push.outputs.image }}
+          image: $IMAGE
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2

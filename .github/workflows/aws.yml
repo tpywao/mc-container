@@ -26,8 +26,6 @@ jobs:
   build-and-deploy:
     name: Build and Deploy to ECS Fargate
     runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.build.outputs.image }}
     permissions:
       id-token: write
     steps:
@@ -41,8 +39,6 @@ jobs:
       - name: Login to Amazon ECR
         id: login
         uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: "false"
 
       - name: Checkout
         uses: actions/checkout@v4

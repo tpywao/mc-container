@@ -15,7 +15,8 @@ env:
   # push image to ecr
   ECR_REPOSITORY: mcbe/server
   # render task difinition
-  ECS_TASK_DIFINITION: .aws/task-definition.json
+  ECS_TASK_DIFINITION_FAMILY: mcbe_server_family
+  ECS_TASK_DIFINITION_REVISION: 6
   ECS_CONTAINER: server
   # deploy
   ECS_CLUSTER: mc-chiwanano
@@ -65,7 +66,8 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DIFINITION }}
+          task-definition-family: ${{ env.ECS_TASK_DIFINITION_FAMILY }}
+          task-definition-revision: ${{ env.ECS_TASK_DIFINITION_REVISION }}
           container-name: ${{ env.ECS_CONTAINER }}
           image: ${{ steps.build.outputs.image_with_tag }}
 

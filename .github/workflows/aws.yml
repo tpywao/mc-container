@@ -1,10 +1,9 @@
 name: Deploy to Amazon ECS Fargate
 
 on:
-  # TODO: on push 以外に良さげなタイミングないかな
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - released
 
 env:
   # login to aws

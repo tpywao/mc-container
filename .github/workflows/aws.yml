@@ -54,13 +54,14 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           MCBE_SERVER_ZIP_PATH: ${{ vars.MCBE_SERVER_ZIP_PATH }}
         run: |
-          export IMAGE=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
-          docker build -t ${IMAGE} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
-          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+          export IMAGE=${ECR_REGISTRY}/${ECR_REPOSITORY}
+          docker build -t ${IMAGE}:${IMAGE_TAG} . --build-arg MCBE_SERVER_ZIP_PATH=${MCBE_SERVER_ZIP_PATH}
+          docker tag ${IMAGE}:${IMAGE_TAG} ${IMAGE}:latest
+          echo "image=${IMAGE}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
       - name: Push image to Amazon ECR
         run: |
-          docker push ${{ steps.build.outputs.image }}
+          docker push ${{ steps.build.outputs.image }} -a
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def

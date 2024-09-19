@@ -1,0 +1,8 @@
+{
+  "prettier.printWidth": 100,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+  "python.analysis.inlayHints.callArgumentNames": "all"
+}

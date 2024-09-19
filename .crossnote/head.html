@@ -1,0 +1,29 @@
+<!-- The content below will be included at the end of the <head> element. -->
+<script type="text/javascript">
+  const configureMermaidIconPacks = () => {
+    window["mermaid"].registerIconPacks([
+      {
+        name: "logos",
+        loader: () =>
+          fetch("https://cdn.jsdelivr.net/npm/@iconify-json/logos/icons.json").then(
+            (res) => res.json()
+          ),
+      },
+      {
+        name: "material-symbols",
+        loader: () =>
+          fetch("https://cdn.jsdelivr.net/npm/@iconify-json/material-symbols/icons.json").then(
+            (res) => res.json()
+          ),
+      }
+    ]);
+  };
+
+  if (document.readyState !== 'loading') {
+    configureMermaidIconPacks();
+  } else {
+    document.addEventListener("DOMContentLoaded", () => {
+      configureMermaidIconPacks();
+    });
+  }
+</script>

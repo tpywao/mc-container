@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "ms-python.vscode-pylance",
+    "ms-python.python",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "editorconfig.editorconfig",
+    "github.vscode-github-actions",
+    "shd101wyy.markdown-preview-enhanced",
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting"
+  ]
+}

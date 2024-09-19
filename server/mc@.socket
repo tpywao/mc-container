@@ -1,0 +1,9 @@
+[Socket]
+ListenFIFO=%t/%N
+RemoveOnStop=true
+SocketMode=660
+SocketUser=mc
+SocketGroup=mc
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,10 @@
+# WIP
+AWSTemplateFormatVersion: 2010-09-09
+Description: A simple EC2 instance
+Resources:
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      # x86_64
+      ImageId: ami-0ddf631ad198e005e
+      InstanceType: t3.medium

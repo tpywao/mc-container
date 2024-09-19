@@ -1,0 +1,22 @@
+[Unit]
+After=network.target local-fs.target
+BindsTo=%N.socket
+Description=Minecraft Bedrock Server  @ %i
+
+[Service]
+Type=simple
+User=mc
+Group=mc
+
+WorkingDirectory=/opt/bedrock/main
+Environment=LD_LIBRARY_PATH=.
+ExecStart=bedrock_server
+Restart=on-failure
+RestartSec=60s
+
+StandardInput=socket
+StandardOutput=append:/var/log/%N.log
+StandardError=append:/var/log/%N.log
+
+[Install]
+WantedBy=multi-user.target

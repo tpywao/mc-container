@@ -1,0 +1,12 @@
+services:
+  mcbe-server:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MCBE_SERVER_ZIP_PATH=https://minecraft.azureedge.net/bin-linux/bedrock-server-1.21.20.03.zip
+      platforms:
+        - linux/amd64
+    ports:
+      - "19132:19132/udp"

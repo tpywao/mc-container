@@ -1,0 +1,19 @@
+[Unit]
+After=local-fs.target
+Description=Shutdown Machine
+
+[Service]
+Type=simple
+User=root
+
+
+WorkingDirectory=/opt/auto_shutdown
+ExecStart=python3 auto_shutdown.py %I
+Restart=on-failure
+RestartSec=60s
+
+StandardOutput=append:/var/log/%N.log
+StandardError=append:/var/log/%N.log
+
+[Install]
+WantedBy=multi-user.target

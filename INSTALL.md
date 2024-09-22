@@ -2,16 +2,17 @@
 
 - AWS
   - EC2
-  - CloudWatch
   - IPAM?
 - CloudFlare
   - Workers
 
 ### EC2
 
-- Debian 系 OS を想定
+- Linux 系 OS を想定
 
 ### user `mc` を作る
+
+マインクラフトサーバを実行するためのユーザを作成
 
 - ログインしないので `nologin` を設定
 - `-M` でホームディレクトリも作らない
@@ -22,8 +23,8 @@ useradd -s /sbin/nologin -M mc
 
 ### 必要なパッケージをインストール
 
-- curl: MCBE サーバの DL
-- git, gh: ワールドデータのバックアップ
+- curl, unzip: MCBE サーバの DL, unzip
+- gh: ワールドデータのバックアップ
 
 ```sh
 apt install curl unzip vim gh
@@ -32,7 +33,7 @@ apt install curl unzip vim gh
 ### Minecraft Bedrock Server を展開
 
 - MCBE_SERVER_ZIP_PATH: https://www.minecraft.net/ja-jp/download/server/bedrock から取得する
-- VERSION
+- VERSION: マイクラサーバのバージョン
 
 ```sh
 curl -Lo ${VERSION}.zip ${MCBE_SERVER_ZIP_PATH}

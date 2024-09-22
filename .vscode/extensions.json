@@ -7,6 +7,7 @@
     "editorconfig.editorconfig",
     "github.vscode-github-actions",
     "shd101wyy.markdown-preview-enhanced",
-    "bpruitt-goddard.mermaid-markdown-syntax-highlighting"
+    "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+    "redhat.vscode-yaml"
   ]
 }

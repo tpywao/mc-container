@@ -4,5 +4,6 @@
   "python.analysis.inlayHints.pytestParameters": true,
   "python.analysis.inlayHints.variableTypes": true,
   "rust-analyzer.inlayHints.bindingModeHints.enable": true,
-  "python.analysis.inlayHints.callArgumentNames": "all"
+  "python.analysis.inlayHints.callArgumentNames": "all",
+  "git.autofetch": "all"
 }

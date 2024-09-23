@@ -10,11 +10,12 @@
       "version": "latest"
     },
     "ghcr.io/devcontainers/features/github-cli:1": {
-      "installDirectlyFromGitHubRelease": true,
+      "installDirectlyFromGitHubRelease": false,
       "version": "latest"
     },
     "ghcr.io/devcontainers/features/node:1": {
       "nodeGypDependencies": true,
+      "installYarnUsingApt": false,
       "version": "lts"
     },
     "ghcr.io/devcontainers/features/python:1": {
@@ -24,36 +25,39 @@
     "ghcr.io/devcontainers/features/rust:1": {
       "version": "latest",
       "profile": "minimal",
-      "targets": "aarch64-unknown-linux-gnu,wasm32-unknown-unknown"
+      "targets": "aarch64-unknown-linux-gnu"
     }
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "github.vscode-github-actions",
+        "EditorConfig.EditorConfig",
+        "wmaurer.change-case",
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "shd101wyy.markdown-preview-enhanced",
+        "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-python.isort",
-        "EditorConfig.EditorConfig",
-        "shd101wyy.markdown-preview-enhanced",
         "ms-python.black-formatter",
         "ms-python.debugpy",
         "ms-python.autopep8",
         "ms-python.flake8",
-        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
-        "amazonwebservices.aws-toolkit-vscode",
-        "wmaurer.change-case",
-        "codezombiech.gitignore",
         "rust-lang.rust-analyzer",
         "vadimcn.vscode-lldb",
         "tamasfe.even-better-toml",
+        "amazonwebservices.aws-toolkit-vscode",
+        "github.vscode-github-actions",
+        "codezombiech.gitignore",
+        "bpruitt-goddard.mermaid-markdown-syntax-highlighting",
+        "esbenp.prettier-vscode",
         "redhat.vscode-yaml"
       ]
     }
-  }
+  },
+  "postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
-  // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "uname -a",
   // Configure tool-specific properties.
   // "customizations": {},
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

@@ -1,5 +1,5 @@
 [Unit]
-Description=Run every 15min and on boot
+Description=Run every 15min
 
 [Timer]
 OnUnitActiveSec=15min
